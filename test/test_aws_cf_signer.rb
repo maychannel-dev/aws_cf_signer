@@ -72,6 +72,17 @@ class TestAwsCfSigner < Test::Unit::TestCase
 
     end
 
+    context "Custom Policy Generation without IpAddress" do
+      should "correctly generate custom policy" do
+        starting = Time.now
+        ending   = Time.now + 3600
+        assert_equal(
+          @cf_signer.generate_custom_policy('http://d84l721fxaaqy9.cloudfront.net/downloads/*', :starting => starting, :ending => ending),
+          %({"Statement":[{"Resource":"http://d84l721fxaaqy9.cloudfront.net/downloads/*","Condition":{"DateLessThan":{"AWS:EpochTime":#{ending.to_i}},"DateGreaterThan":{"AWS:EpochTime":#{starting.to_i}}}}]})
+          )
+      end
+    end
+
     context "can_use_canned_policy?" do
       should "use canned policy if specific resource and ending time is given" do
         ending = Time.new('2100-01-01')
